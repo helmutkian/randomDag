@@ -1,8 +1,5 @@
 function randomDag(numNodes, edgePct) {
     var adjMatrix = createMatrix(numNodes);
-
-    adjMatrix[0][0] = 0;
-
     for (var i = 1; i < numNodes; i++) {
 	for (var j = 0; j < i; j++) {
 	    adjMatrix[i][j] = hasEdge(edgePct) ? 1 : 0;
