@@ -1,33 +1,45 @@
 function randomDag(numNodes, edgePct) {
-    var nodeLinks = unfoldRange(1, numNodes, function (i) {
-	return unfoldRange(0, i, function (j) {
-	    return hasEdge(edgePct) ?  j  : null;
-	});
-    });
+    var adjMatrix = createMatrix(numNodes);
 
-    return nodeLinks
-	.map(function (sources, target) {
-	    return sources
-		.filter(function (source) {
-		    return source !== null;
-		})
-		.map(function (source) {
-		    return { source: source, target: target };
-		});
-	})
-	.reduce(function (acc, links) {
-	    return acc.concat(links);
-	}, []);
-}
+    adjMatrix[0][0] = 0;
 
-function unfoldRange(start, end, fn) {
-    var arr = [];
-
-    for (var i = start; i < end; i++) {
-	arr[i] = fn(i);
+    for (var i = 1; i < numNodes; i++) {
+	for (var j = 0; j < i; j++) {
+	    adjMatrix[i][j] = hasEdge(edgePct) ? 1 : 0;
+	}
     }
 
-    return arr;
+    console.log("Unconnected:" + getUnconnectedNodes(adjMatrix));
+    
+    return adjMatrix;
+}
+
+function getUnconnectedNodes(adjMatrix) {
+    var unconnectedNodes = [];
+
+    adjMatrix.forEach(function (row, i) {
+	var hasIncoming = row.some(function (col) { return col;	});
+	var hasOutgoing = adjMatrix.slice(i + 1).some(function (row) { return row[i]; });
+
+	if (!hasIncoming && !hasOutgoing) {
+	    unconnectedNodes = i;
+	}
+    });
+    
+    return unconnectedNodes;
+}
+
+function createMatrix(size) {
+    var matrix = Array(size);
+
+    for (var i = 0; i < size; i++) {
+	matrix[i] = Array(size);
+	for (var j = 0; j < size; j++) {
+	    matrix[i][j] = 0;
+	}
+    }
+
+    return matrix;
 }
 
 function hasEdge(edgePct) {
@@ -37,3 +49,5 @@ function hasEdge(edgePct) {
 function getRandom(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min;	
 }
+
+console.log(randomDag(7, 30));
